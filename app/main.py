@@ -15,6 +15,7 @@ from app.web import auth as auth_web
 from app.web import categorias as categorias_web
 from app.web import contas as contas_web
 from app.web import fontes_renda as fontes_renda_web
+from app.web import lancamentos as lancamentos_web
 from app.web.deps import usuario_atual_opcional
 
 app = FastAPI(
@@ -31,13 +32,14 @@ app.include_router(auth_web.router)
 app.include_router(contas_web.router)
 app.include_router(categorias_web.router)
 app.include_router(fontes_renda_web.router)
+app.include_router(lancamentos_web.router)
 
 
 @app.get("/")
 def raiz(usuario=Depends(usuario_atual_opcional)):
     if usuario is None:
         return RedirectResponse(url="/login")
-    return RedirectResponse(url="/contas")
+    return RedirectResponse(url="/lancamentos")
 
 
 @app.get("/health")

@@ -8,15 +8,9 @@ from app.models import Categoria, Conta, FonteDeRenda
 from app.models.enums import TipoLancamento
 from app.repositories import cadastros as repos
 
+from app.services.erros import ErroDeNegocio, NaoEncontrado
+
 TAMANHO_MAXIMO_NOME = 80
-
-
-class ErroDeNegocio(Exception):
-    """Violação de regra de negócio; a mensagem pode ser exibida ao usuário."""
-
-
-class NaoEncontrado(ErroDeNegocio):
-    pass
 
 
 class ServicoCadastro:
