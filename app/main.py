@@ -3,7 +3,7 @@ Ponto de entrada da aplicação: cria a instância FastAPI, registra
 middlewares e inclui os routers.
 """
 
-from fastapi import Depends, FastAPI, Request
+from fastapi import Depends, FastAPI
 from fastapi.responses import RedirectResponse
 from sqlalchemy import text
 from sqlalchemy.orm import Session
@@ -12,6 +12,9 @@ from starlette.middleware.sessions import SessionMiddleware
 from app.config import settings
 from app.database import get_db
 from app.web import auth as auth_web
+from app.web import categorias as categorias_web
+from app.web import contas as contas_web
+from app.web import fontes_renda as fontes_renda_web
 from app.web.deps import usuario_atual_opcional
 
 app = FastAPI(
@@ -25,18 +28,16 @@ app = FastAPI(
 app.add_middleware(SessionMiddleware, secret_key=settings.secret_key)
 
 app.include_router(auth_web.router)
+app.include_router(contas_web.router)
+app.include_router(categorias_web.router)
+app.include_router(fontes_renda_web.router)
 
 
 @app.get("/")
-def raiz(request: Request, usuario=Depends(usuario_atual_opcional)):
+def raiz(usuario=Depends(usuario_atual_opcional)):
     if usuario is None:
         return RedirectResponse(url="/login")
-    return {
-        "app": "Gestão Financeira Pessoal",
-        "ambiente": settings.environment,
-        "status": "no ar",
-        "usuario_logado": usuario.nome,
-    }
+    return RedirectResponse(url="/contas")
 
 
 @app.get("/health")
@@ -49,3 +50,4 @@ def health(db: Session = Depends(get_db)) -> dict:
     """
     db.execute(text("SELECT 1"))
     return {"banco_de_dados": "conectado"}
+

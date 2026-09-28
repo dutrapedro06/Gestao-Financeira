@@ -1,0 +1,55 @@
+<div id="pagina">
+<h1 class="text-2xl font-semibold mb-6">Categorias</h1>
+
+{% if erro %}
+<div class="bg-red-900/40 border border-red-700 text-red-200 text-sm rounded-md px-4 py-2 mb-4">{{ erro }}</div>
+{% endif %}
+
+<ul class="space-y-2 mb-6">
+  {% for categoria in categorias %}
+  <li class="bg-slate-900 border border-slate-800 rounded-md px-4 py-3">
+    {% if categoria.id == editando_id %}
+    <form hx-put="/categorias/{{ categoria.id }}" hx-target="#pagina" hx-swap="outerHTML" class="flex gap-2 items-center">
+      <input name="nome" value="{{ categoria.nome }}" required maxlength="80"
+             class="flex-1 rounded-md bg-slate-800 border border-slate-700 px-2 py-1 text-sm">
+      <select name="tipo" class="rounded-md bg-slate-800 border border-slate-700 px-2 py-1 text-sm">
+        <option value="receita" {% if categoria.tipo.value == "receita" %}selected{% endif %}>Receita</option>
+        <option value="despesa" {% if categoria.tipo.value == "despesa" %}selected{% endif %}>Despesa</option>
+      </select>
+      <button class="text-emerald-400 hover:text-emerald-300 text-sm">Salvar</button>
+      <a hx-get="/categorias" hx-target="#pagina" hx-swap="outerHTML" class="text-slate-400 hover:text-white text-sm cursor-pointer">Cancelar</a>
+    </form>
+    {% else %}
+    <div class="flex items-center justify-between">
+      <div>
+        <span class="font-medium">{{ categoria.nome }}</span>
+        <span class="text-xs ml-2 px-2 py-0.5 rounded-full {{ 'bg-emerald-900 text-emerald-300' if categoria.tipo.value == 'receita' else 'bg-rose-900 text-rose-300' }}">
+          {{ "Receita" if categoria.tipo.value == "receita" else "Despesa" }}
+        </span>
+      </div>
+      <div class="flex items-center gap-4">
+        <a hx-get="/categorias/{{ categoria.id }}/editar" hx-target="#pagina" hx-swap="outerHTML"
+           class="text-slate-400 hover:text-white text-sm cursor-pointer">editar</a>
+        <a hx-delete="/categorias/{{ categoria.id }}" hx-target="#pagina" hx-swap="outerHTML"
+           hx-confirm="Excluir a categoria '{{ categoria.nome }}'?"
+           class="text-red-400 hover:text-red-300 text-sm cursor-pointer">excluir</a>
+      </div>
+    </div>
+    {% endif %}
+  </li>
+  {% else %}
+  <li class="text-slate-500 text-sm">Nenhuma categoria cadastrada ainda.</li>
+  {% endfor %}
+</ul>
+
+<form hx-post="/categorias" hx-target="#pagina" hx-swap="outerHTML" class="flex gap-2">
+  <input name="nome" placeholder="Nova categoria (ex: Mercado)" required maxlength="80"
+         class="flex-1 rounded-md bg-slate-900 border border-slate-700 px-3 py-2">
+  <select name="tipo" class="rounded-md bg-slate-900 border border-slate-700 px-3 py-2">
+    <option value="despesa">Despesa</option>
+    <option value="receita">Receita</option>
+  </select>
+  <button class="rounded-md bg-emerald-600 hover:bg-emerald-500 px-4 py-2 font-medium">Adicionar</button>
+</form>
+</div>
+

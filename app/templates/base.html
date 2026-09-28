@@ -8,7 +8,17 @@
     <script src="https://unpkg.com/htmx.org@2.0.4"></script>
 </head>
 <body class="bg-slate-950 text-slate-100 min-h-screen">
-    <main class="max-w-md mx-auto mt-16 px-4">
+    {% if usuario %}
+    <nav class="border-b border-slate-800 px-4 py-3 flex items-center gap-4 text-sm">
+        <a href="/" class="font-semibold">Gestão Financeira</a>
+        <a href="/contas" class="text-slate-300 hover:text-white">Contas</a>
+        <a href="/categorias" class="text-slate-300 hover:text-white">Categorias</a>
+        <a href="/fontes-renda" class="text-slate-300 hover:text-white">Fontes de renda</a>
+        <span class="ml-auto text-slate-400">{{ usuario.nome }}</span>
+        <form method="post" action="/logout"><button class="text-slate-400 hover:text-white">Sair</button></form>
+    </nav>
+    {% endif %}
+    <main class="max-w-2xl mx-auto mt-10 px-4">
         {% block conteudo %}{% endblock %}
     </main>
 </body>

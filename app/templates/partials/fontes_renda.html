@@ -1,0 +1,42 @@
+<div id="pagina">
+<h1 class="text-2xl font-semibold mb-6">Fontes de renda</h1>
+
+{% if erro %}
+<div class="bg-red-900/40 border border-red-700 text-red-200 text-sm rounded-md px-4 py-2 mb-4">{{ erro }}</div>
+{% endif %}
+
+<ul class="space-y-2 mb-6">
+  {% for fonte in fontes %}
+  <li class="bg-slate-900 border border-slate-800 rounded-md px-4 py-3">
+    {% if fonte.id == editando_id %}
+    <form hx-put="/fontes-renda/{{ fonte.id }}" hx-target="#pagina" hx-swap="outerHTML" class="flex gap-2 items-center">
+      <input name="nome" value="{{ fonte.nome }}" required maxlength="80"
+             class="flex-1 rounded-md bg-slate-800 border border-slate-700 px-2 py-1 text-sm">
+      <button class="text-emerald-400 hover:text-emerald-300 text-sm">Salvar</button>
+      <a hx-get="/fontes-renda" hx-target="#pagina" hx-swap="outerHTML" class="text-slate-400 hover:text-white text-sm cursor-pointer">Cancelar</a>
+    </form>
+    {% else %}
+    <div class="flex items-center justify-between">
+      <span class="font-medium">{{ fonte.nome }}</span>
+      <div class="flex items-center gap-4">
+        <a hx-get="/fontes-renda/{{ fonte.id }}/editar" hx-target="#pagina" hx-swap="outerHTML"
+           class="text-slate-400 hover:text-white text-sm cursor-pointer">editar</a>
+        <a hx-delete="/fontes-renda/{{ fonte.id }}" hx-target="#pagina" hx-swap="outerHTML"
+           hx-confirm="Excluir a fonte '{{ fonte.nome }}'?"
+           class="text-red-400 hover:text-red-300 text-sm cursor-pointer">excluir</a>
+      </div>
+    </div>
+    {% endif %}
+  </li>
+  {% else %}
+  <li class="text-slate-500 text-sm">Nenhuma fonte de renda cadastrada ainda.</li>
+  {% endfor %}
+</ul>
+
+<form hx-post="/fontes-renda" hx-target="#pagina" hx-swap="outerHTML" class="flex gap-2">
+  <input name="nome" placeholder="Nova fonte (ex: Salário CLT)" required maxlength="80"
+         class="flex-1 rounded-md bg-slate-900 border border-slate-700 px-3 py-2">
+  <button class="rounded-md bg-emerald-600 hover:bg-emerald-500 px-4 py-2 font-medium">Adicionar</button>
+</form>
+</div>
+

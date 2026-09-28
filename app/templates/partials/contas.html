@@ -1,0 +1,47 @@
+<div id="pagina">
+<h1 class="text-2xl font-semibold mb-1">Contas</h1>
+<p class="text-slate-400 mb-6">Saldo geral: <span class="font-medium text-slate-100">R$ {{ "%.2f"|format(saldo_geral) }}</span></p>
+
+{% if erro %}
+<div class="bg-red-900/40 border border-red-700 text-red-200 text-sm rounded-md px-4 py-2 mb-4">{{ erro }}</div>
+{% endif %}
+
+<ul class="space-y-2 mb-6">
+  {% for conta in contas %}
+  <li class="bg-slate-900 border border-slate-800 rounded-md px-4 py-3">
+    {% if conta.id == editando_id %}
+    <form hx-put="/contas/{{ conta.id }}" hx-target="#pagina" hx-swap="outerHTML" class="flex gap-2 items-center">
+      <input name="nome" value="{{ conta.nome }}" required maxlength="80"
+             class="flex-1 rounded-md bg-slate-800 border border-slate-700 px-2 py-1 text-sm">
+      <button class="text-emerald-400 hover:text-emerald-300 text-sm">Salvar</button>
+      <a href="/contas" hx-get="/contas" hx-target="#pagina" hx-swap="outerHTML" class="text-slate-400 hover:text-white text-sm cursor-pointer">Cancelar</a>
+    </form>
+    {% else %}
+    <div class="flex items-center justify-between">
+      <div>
+        <span class="font-medium">{{ conta.nome }}</span>
+        <span class="text-slate-400 text-sm ml-2">{{ conta.moeda }}</span>
+      </div>
+      <div class="flex items-center gap-4">
+        <span class="tabular-nums">R$ {{ "%.2f"|format(saldos[conta.id]) }}</span>
+        <a hx-get="/contas/{{ conta.id }}/editar" hx-target="#pagina" hx-swap="outerHTML"
+           class="text-slate-400 hover:text-white text-sm cursor-pointer">editar</a>
+        <a hx-delete="/contas/{{ conta.id }}" hx-target="#pagina" hx-swap="outerHTML"
+           hx-confirm="Excluir a conta '{{ conta.nome }}'?"
+           class="text-red-400 hover:text-red-300 text-sm cursor-pointer">excluir</a>
+      </div>
+    </div>
+    {% endif %}
+  </li>
+  {% else %}
+  <li class="text-slate-500 text-sm">Nenhuma conta cadastrada ainda.</li>
+  {% endfor %}
+</ul>
+
+<form hx-post="/contas" hx-target="#pagina" hx-swap="outerHTML" class="flex gap-2">
+  <input name="nome" placeholder="Nova conta (ex: Conta corrente)" required maxlength="80"
+         class="flex-1 rounded-md bg-slate-900 border border-slate-700 px-3 py-2">
+  <button class="rounded-md bg-emerald-600 hover:bg-emerald-500 px-4 py-2 font-medium">Adicionar</button>
+</form>
+</div>
+
