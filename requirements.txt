@@ -1,0 +1,20 @@
+# --- Etapa 0: fundação ---
+fastapi==0.115.6
+uvicorn[standard]==0.34.0
+pydantic-settings==2.7.1
+sqlalchemy==2.0.36
+psycopg2-binary==2.9.10
+alembic==1.14.0
+python-dotenv==1.0.1
+
+# --- Próximas etapas (já fixadas para facilitar o setup, mesmo sem uso ainda) ---
+jinja2==3.1.5          # Etapa 2: templates HTML
+python-multipart==0.0.20  # Etapa 2: formulários HTML
+bcrypt==4.2.1          # Etapa 1: hash de senha
+itsdangerous==2.2.0    # Etapa 1: assinatura do cookie de sessão
+pandas==2.2.3          # Etapa 4: análise de dados
+plotly==5.24.1         # Etapa 4: gráficos
+
+# --- Testes ---
+pytest==8.3.4
+httpx==0.28.1          # cliente de testes do FastAPI (TestClient)
