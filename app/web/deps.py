@@ -25,10 +25,9 @@ def exigir_usuario_logado(
     usuario: Usuario | None = Depends(usuario_atual_opcional),
 ) -> Usuario:
     """
-    Dependency para proteger rotas que exigem login (Etapa 2 em diante).
+    Dependency para proteger rotas que exigem login.
     Lança 401 se não houver usuário autenticado na sessão.
     """
     if usuario is None:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Login necessário")
     return usuario
-

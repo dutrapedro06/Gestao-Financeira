@@ -1,10 +1,9 @@
 """
 Lancamento: a entidade central — cobre tanto receita quanto despesa.
 
-Note que "conta_id" é onde o seu exemplo de uso ganha vida: ao registrar
-uma despesa, você escolhe de qual conta ela sai (ex: Vale-refeição em vez
-de Conta Corrente), sem precisar de nenhuma lógica especial — é só um
-lançamento vinculado àquela conta.
+O campo "conta_id" define de qual conta o valor sai ou entra (ex:
+Vale-refeição em vez de Conta Corrente), sem exigir lógica especial —
+é só um lançamento vinculado àquela conta.
 """
 
 from datetime import date, datetime
@@ -36,4 +35,3 @@ class Lancamento(Base):
     categoria: Mapped["Categoria"] = relationship(back_populates="lancamentos")
     fonte_renda: Mapped["FonteDeRenda"] = relationship(back_populates="lancamentos")
     regra_recorrencia: Mapped["RegraRecorrencia"] = relationship(back_populates="lancamentos_gerados")
-

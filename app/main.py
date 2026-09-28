@@ -1,10 +1,6 @@
 """
-Ponto de entrada da aplicação.
-
-Nesta Etapa 0, o objetivo é só validar a fundação: a aplicação sobe,
-consegue falar com o banco de dados, e temos um endpoint simples para
-confirmar isso (/health). Os models e as rotas de verdade (contas,
-lançamentos, dashboard) entram nas próximas etapas.
+Ponto de entrada da aplicação: cria a instância FastAPI, registra
+middlewares e inclui os routers.
 """
 
 from fastapi import Depends, FastAPI, Request
@@ -48,10 +44,8 @@ def health(db: Session = Depends(get_db)) -> dict:
     """
     Confirma que a aplicação consegue de fato executar uma query no
     Postgres — não só que a variável DATABASE_URL existe, mas que a
-    conexão funciona de ponta a ponta. Útil tanto agora, para você
-    validar o setup local, quanto depois, em produção, para health
-    checks automáticos da hospedagem.
+    conexão funciona de ponta a ponta. Serve tanto para validação
+    local quanto como health check em produção.
     """
     db.execute(text("SELECT 1"))
     return {"banco_de_dados": "conectado"}
-

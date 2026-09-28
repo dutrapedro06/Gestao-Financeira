@@ -1,9 +1,6 @@
 """
-Cria um usuário diretamente no banco.
-
-Necessário porque, nesta etapa, não existe tela pública de cadastro
-(planejado para a Etapa 7) — o próprio dono do sistema (e, futuramente,
-cada nova pessoa que for usar) precisa ser inserido assim, uma vez.
+Cria um usuário diretamente no banco. Necessário enquanto não existe
+tela pública de cadastro.
 
 Uso:
     python scripts/criar_usuario.py
@@ -46,4 +43,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-

@@ -22,7 +22,7 @@ SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 class Base(DeclarativeBase):
     """
-    Classe base para todos os models SQLAlchemy (Etapa 1 em diante).
+    Classe base para todos os models SQLAlchemy.
     Mantida aqui, e não em app/models/, para evitar import circular
     entre database.py e os arquivos de model.
     """

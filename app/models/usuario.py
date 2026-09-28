@@ -2,8 +2,8 @@
 Usuario: cada usuário tem seus dados totalmente isolados (contas,
 categorias, lançamentos, etc. sempre referenciam um usuario_id).
 
-Como definido, não há cadastro público ainda (Etapa 7) — o(s) primeiro(s)
-usuário(s) são criados via script (scripts/criar_usuario.py).
+Não há cadastro público ainda — usuários são criados via script
+(scripts/criar_usuario.py).
 """
 
 from datetime import datetime
@@ -29,4 +29,3 @@ class Usuario(Base):
     regras_recorrencia: Mapped[list["RegraRecorrencia"]] = relationship(
         back_populates="usuario", cascade="all, delete-orphan"
     )
-

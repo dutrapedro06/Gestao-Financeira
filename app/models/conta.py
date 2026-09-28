@@ -6,7 +6,7 @@ O saldo NUNCA é armazenado como coluna fixa — ele é sempre calculado a
 partir do histórico de Lancamento e TransferenciaEntreContas associados a
 esta conta (ver ADR 0004). Isso evita que o saldo exibido fique
 dessincronizado do histórico real de movimentações. O cálculo em si fica
-em app/services (Etapa 2), não aqui no model.
+em app/services, não aqui no model.
 """
 
 from datetime import datetime
@@ -40,4 +40,3 @@ class Conta(Base):
         back_populates="conta_destino",
         foreign_keys="TransferenciaEntreContas.conta_destino_id",
     )
-
