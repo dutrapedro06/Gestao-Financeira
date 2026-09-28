@@ -1,9 +1,9 @@
 """
-Teste de integração da Etapa 0: valida que a aplicação sobe e que o
-endpoint /health consegue de fato conversar com o banco de dados.
+Testes de integração.
 
-Para rodar: pytest (com o Postgres do docker-compose no ar e o .env
-configurado).
+test_raiz_redireciona_sem_login: não depende do banco, roda sempre.
+test_health_confirma_conexao_com_banco: precisa do Postgres do
+docker-compose no ar e do .env configurado (SELECT 1 de verdade).
 """
 
 from fastapi.testclient import TestClient
@@ -13,13 +13,20 @@ from app.main import app
 client = TestClient(app)
 
 
-def test_raiz_responde():
-    resposta = client.get("/")
+def test_raiz_redireciona_para_login_sem_sessao():
+    resposta = client.get("/", follow_redirects=False)
+    assert resposta.status_code == 307
+    assert resposta.headers["location"] == "/login"
+
+
+def test_pagina_de_login_carrega():
+    resposta = client.get("/login")
     assert resposta.status_code == 200
-    assert resposta.json()["app"] == "Gestão Financeira Pessoal"
+    assert "E-mail" in resposta.text
 
 
 def test_health_confirma_conexao_com_banco():
     resposta = client.get("/health")
     assert resposta.status_code == 200
     assert resposta.json() == {"banco_de_dados": "conectado"}
+

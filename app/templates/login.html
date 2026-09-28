@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block titulo %}Entrar — Gestão Financeira{% endblock %}
+
+{% block conteudo %}
+<h1 class="text-2xl font-semibold mb-6">Gestão Financeira Pessoal</h1>
+
+{% if erro %}
+<div class="bg-red-900/40 border border-red-700 text-red-200 text-sm rounded-md px-4 py-2 mb-4">
+    {{ erro }}
+</div>
+{% endif %}
+
+<form method="post" action="/login" class="space-y-4">
+    <div>
+        <label class="block text-sm mb-1" for="email">E-mail</label>
+        <input class="w-full rounded-md bg-slate-900 border border-slate-700 px-3 py-2"
+               type="email" name="email" id="email" required autofocus>
+    </div>
+    <div>
+        <label class="block text-sm mb-1" for="senha">Senha</label>
+        <input class="w-full rounded-md bg-slate-900 border border-slate-700 px-3 py-2"
+               type="password" name="senha" id="senha" required>
+    </div>
+    <button type="submit"
+            class="w-full rounded-md bg-emerald-600 hover:bg-emerald-500 transition-colors py-2 font-medium">
+        Entrar
+    </button>
+</form>
+{% endblock %}
+
