@@ -78,7 +78,10 @@
         {{ "Despesa" if l.tipo.value == "despesa" else "Receita" }}
       </span>
       <div>
-        <div class="font-medium">{{ l.categoria.nome }} <span class="text-slate-400 font-normal">· {{ l.conta.nome }}</span></div>
+        <div class="font-medium">
+          {{ l.categoria.nome }} <span class="text-slate-400 font-normal">· {{ l.conta.nome }}</span>
+          {% if l.regra_recorrencia_id %}<span class="text-xs text-slate-500">(automático)</span>{% endif %}
+        </div>
         {% if l.descricao %}<div class="text-sm text-slate-400">{{ l.descricao }}</div>{% endif %}
       </div>
     </div>

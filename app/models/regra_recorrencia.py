@@ -38,5 +38,8 @@ class RegraRecorrencia(Base):
     ativa: Mapped[bool] = mapped_column(default=True, server_default="true")
 
     usuario: Mapped["Usuario"] = relationship(back_populates="regras_recorrencia")
+    conta: Mapped["Conta"] = relationship()
+    categoria: Mapped["Categoria"] = relationship()
+    fonte_renda: Mapped["FonteDeRenda"] = relationship()
     lancamentos_gerados: Mapped[list["Lancamento"]] = relationship(back_populates="regra_recorrencia")
 

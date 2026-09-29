@@ -1,0 +1,126 @@
+<div id="pagina">
+<h1 class="text-2xl font-semibold mb-1">Recorrências</h1>
+<p class="text-slate-400 text-sm mb-6">Lançamentos que se repetem automaticamente (ex: aluguel, salário fixo).</p>
+
+{% if erro %}
+<div class="bg-red-900/40 border border-red-700 text-red-200 text-sm rounded-md px-4 py-2 mb-4">{{ erro }}</div>
+{% endif %}
+
+{% if not contas or not categorias %}
+<div class="bg-amber-900/40 border border-amber-700 text-amber-200 text-sm rounded-md px-4 py-2 mb-4">
+  Cadastre pelo menos uma <a href="/contas" class="underline">conta</a> e uma
+  <a href="/categorias" class="underline">categoria</a> antes de criar uma recorrência.
+</div>
+{% endif %}
+
+{% set alvo = "/recorrencias/" ~ editando.id if editando else "/recorrencias" %}
+{% set metodo = "hx-put" if editando else "hx-post" %}
+
+<form {{ metodo }}="{{ alvo }}" hx-target="#pagina" hx-swap="outerHTML"
+      class="bg-slate-900 border border-slate-800 rounded-md p-4 mb-6 space-y-3">
+  <div class="grid grid-cols-2 gap-3">
+    <select name="tipo" class="rounded-md bg-slate-800 border border-slate-700 px-3 py-2">
+      <option value="despesa" {% if not editando or editando.tipo.value == "despesa" %}selected{% endif %}>Despesa</option>
+      <option value="receita" {% if editando and editando.tipo.value == "receita" %}selected{% endif %}>Receita</option>
+    </select>
+    <input type="number" step="0.01" min="0.01" name="valor" placeholder="Valor"
+           value="{{ editando.valor if editando else '' }}" required
+           class="rounded-md bg-slate-800 border border-slate-700 px-3 py-2">
+  </div>
+
+  <div class="grid grid-cols-2 gap-3">
+    <select name="conta_id" required class="rounded-md bg-slate-800 border border-slate-700 px-3 py-2">
+      <option value="" disabled {% if not editando %}selected{% endif %}>Conta</option>
+      {% for conta in contas %}
+      <option value="{{ conta.id }}" {% if editando and editando.conta_id == conta.id %}selected{% endif %}>{{ conta.nome }}</option>
+      {% endfor %}
+    </select>
+    <select name="categoria_id" required class="rounded-md bg-slate-800 border border-slate-700 px-3 py-2">
+      <option value="" disabled {% if not editando %}selected{% endif %}>Categoria</option>
+      {% for categoria in categorias %}
+      <option value="{{ categoria.id }}" {% if editando and editando.categoria_id == categoria.id %}selected{% endif %}>
+        {{ categoria.nome }} ({{ categoria.tipo.value }})
+      </option>
+      {% endfor %}
+    </select>
+  </div>
+
+  <select name="fonte_renda_id" class="w-full rounded-md bg-slate-800 border border-slate-700 px-3 py-2">
+    <option value="">Fonte de renda (opcional, só receita)</option>
+    {% for fonte in fontes %}
+    <option value="{{ fonte.id }}" {% if editando and editando.fonte_renda_id == fonte.id %}selected{% endif %}>{{ fonte.nome }}</option>
+    {% endfor %}
+  </select>
+
+  <div class="grid grid-cols-2 gap-3">
+    <select name="frequencia" class="rounded-md bg-slate-800 border border-slate-700 px-3 py-2">
+      <option value="mensal" {% if not editando or editando.frequencia.value == "mensal" %}selected{% endif %}>Mensal</option>
+      <option value="semanal" {% if editando and editando.frequencia.value == "semanal" %}selected{% endif %}>Semanal</option>
+    </select>
+    <input type="number" name="dia_referencia" placeholder="Dia (mês: 1-28, semana: 0=seg..6=dom)"
+           value="{{ editando.dia_referencia if editando else '' }}" required
+           class="rounded-md bg-slate-800 border border-slate-700 px-3 py-2">
+  </div>
+
+  <div class="grid grid-cols-2 gap-3">
+    <div>
+      <label class="text-xs text-slate-400">Início</label>
+      <input type="date" name="data_inicio" value="{{ editando.data_inicio.isoformat() if editando else hoje }}" required
+             class="w-full rounded-md bg-slate-800 border border-slate-700 px-3 py-2">
+    </div>
+    <div>
+      <label class="text-xs text-slate-400">Fim (opcional)</label>
+      <input type="date" name="data_fim" value="{{ editando.data_fim.isoformat() if editando and editando.data_fim else '' }}"
+             class="w-full rounded-md bg-slate-800 border border-slate-700 px-3 py-2">
+    </div>
+  </div>
+
+  <input name="descricao" placeholder="Descrição (opcional)" maxlength="255"
+         value="{{ editando.descricao or '' if editando else '' }}"
+         class="w-full rounded-md bg-slate-800 border border-slate-700 px-3 py-2">
+
+  <div class="flex gap-2">
+    <button class="rounded-md bg-emerald-600 hover:bg-emerald-500 px-4 py-2 font-medium">
+      {{ "Salvar" if editando else "Criar recorrência" }}
+    </button>
+    {% if editando %}
+    <a hx-get="/recorrencias" hx-target="#pagina" hx-swap="outerHTML"
+       class="text-slate-400 hover:text-white text-sm self-center cursor-pointer">Cancelar</a>
+    {% endif %}
+  </div>
+</form>
+
+<ul class="space-y-2">
+  {% for r in regras %}
+  <li class="bg-slate-900 border border-slate-800 rounded-md px-4 py-3 flex items-center justify-between {{ 'opacity-50' if not r.ativa }}">
+    <div class="flex items-center gap-3">
+      <span class="text-xs px-2 py-0.5 rounded-full {{ 'bg-rose-900 text-rose-300' if r.tipo.value == 'despesa' else 'bg-emerald-900 text-emerald-300' }}">
+        {{ "Despesa" if r.tipo.value == "despesa" else "Receita" }}
+      </span>
+      <div>
+        <div class="font-medium">{{ r.categoria.nome }} <span class="text-slate-400 font-normal">· {{ r.conta.nome }}</span></div>
+        <div class="text-sm text-slate-400">
+          {{ "Mensal, dia" if r.frequencia.value == "mensal" else "Semanal, " }} {{ r.dia_referencia }}
+          · desde {{ r.data_inicio.strftime("%d/%m/%Y") }}
+          {% if r.data_fim %}até {{ r.data_fim.strftime("%d/%m/%Y") }}{% endif %}
+          {% if not r.ativa %}· <span class="text-amber-400">pausada</span>{% endif %}
+        </div>
+      </div>
+    </div>
+    <div class="flex items-center gap-4">
+      <span class="tabular-nums">R$ {{ "%.2f"|format(r.valor) }}</span>
+      <a hx-post="/recorrencias/{{ r.id }}/alternar" hx-target="#pagina" hx-swap="outerHTML"
+         class="text-slate-400 hover:text-white text-sm cursor-pointer">{{ "pausar" if r.ativa else "reativar" }}</a>
+      <a hx-get="/recorrencias/{{ r.id }}/editar" hx-target="#pagina" hx-swap="outerHTML"
+         class="text-slate-400 hover:text-white text-sm cursor-pointer">editar</a>
+      <a hx-delete="/recorrencias/{{ r.id }}" hx-target="#pagina" hx-swap="outerHTML"
+         hx-confirm="Excluir esta recorrência? Os lançamentos já gerados continuam no histórico."
+         class="text-red-400 hover:text-red-300 text-sm cursor-pointer">excluir</a>
+    </div>
+  </li>
+  {% else %}
+  <li class="text-slate-500 text-sm">Nenhuma recorrência cadastrada ainda.</li>
+  {% endfor %}
+</ul>
+</div>
+

@@ -12,6 +12,7 @@ from app.services import saldo_service
 from app.services.cadastros import servico_categorias, servico_contas, servico_fontes_renda
 from app.services.erros import ErroDeNegocio, NaoEncontrado
 from app.services.lancamentos import servico_lancamentos
+from app.services.regras_recorrencia import gerar_lancamentos_pendentes
 from app.web.deps import exigir_usuario_logado
 
 router = APIRouter(prefix="/lancamentos")
@@ -60,6 +61,7 @@ def _dados_form(
 
 @router.get("")
 def listar(request: Request, db: Session = Depends(get_db), usuario=Depends(exigir_usuario_logado)):
+    gerar_lancamentos_pendentes(db, usuario.id)
     return _renderizar(request, db, usuario)
 
 
