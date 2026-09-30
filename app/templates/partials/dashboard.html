@@ -1,0 +1,82 @@
+<div id="pagina">
+<h1 class="text-2xl font-semibold mb-6">Dashboard</h1>
+
+<form hx-get="/dashboard" hx-target="#pagina" hx-swap="outerHTML"
+      class="bg-slate-900 border border-slate-800 rounded-md p-4 mb-6 grid grid-cols-2 md:grid-cols-5 gap-3 items-end">
+  <div>
+    <label class="text-xs text-slate-400 block mb-1">De</label>
+    <input type="date" name="data_inicio" value="{{ data_inicio }}"
+           class="w-full rounded-md bg-slate-800 border border-slate-700 px-3 py-2">
+  </div>
+  <div>
+    <label class="text-xs text-slate-400 block mb-1">Até</label>
+    <input type="date" name="data_fim" value="{{ data_fim }}"
+           class="w-full rounded-md bg-slate-800 border border-slate-700 px-3 py-2">
+  </div>
+  <select name="categoria_id" class="rounded-md bg-slate-800 border border-slate-700 px-3 py-2">
+    <option value="">Todas as categorias</option>
+    {% for c in categorias %}
+    <option value="{{ c.id }}" {% if categoria_id == c.id %}selected{% endif %}>{{ c.nome }}</option>
+    {% endfor %}
+  </select>
+  <select name="fonte_id" class="rounded-md bg-slate-800 border border-slate-700 px-3 py-2">
+    <option value="">Todas as fontes</option>
+    {% for f in fontes %}
+    <option value="{{ f.id }}" {% if fonte_id == f.id %}selected{% endif %}>{{ f.nome }}</option>
+    {% endfor %}
+  </select>
+  <button class="rounded-md bg-emerald-600 hover:bg-emerald-500 px-4 py-2 font-medium">Filtrar</button>
+</form>
+
+<div class="grid grid-cols-3 gap-3 mb-6">
+  <div class="bg-slate-900 border border-slate-800 rounded-md p-4">
+    <div class="text-slate-400 text-xs">Receitas no período</div>
+    <div class="text-lg font-semibold text-emerald-300">R$ {{ "%.2f"|format(total_receitas) }}</div>
+  </div>
+  <div class="bg-slate-900 border border-slate-800 rounded-md p-4">
+    <div class="text-slate-400 text-xs">Despesas no período</div>
+    <div class="text-lg font-semibold text-rose-300">R$ {{ "%.2f"|format(total_despesas) }}</div>
+  </div>
+  <div class="bg-slate-900 border border-slate-800 rounded-md p-4">
+    <div class="text-slate-400 text-xs">Saldo do período</div>
+    <div class="text-lg font-semibold">R$ {{ "%.2f"|format(saldo_periodo) }}</div>
+  </div>
+</div>
+
+<div class="grid md:grid-cols-2 gap-4 mb-6">
+  <div class="bg-slate-900 border border-slate-800 rounded-md p-4">
+    <h2 class="text-sm text-slate-400 mb-2">Gastos por categoria</h2>
+    {% if grafico_categorias %}
+      {{ grafico_categorias | safe }}
+    {% else %}
+      <p class="text-slate-500 text-sm py-10 text-center">Sem despesas no período.</p>
+    {% endif %}
+  </div>
+  <div class="bg-slate-900 border border-slate-800 rounded-md p-4">
+    <h2 class="text-sm text-slate-400 mb-2">Evolução do saldo geral</h2>
+    {{ grafico_saldo | safe }}
+  </div>
+</div>
+
+<h2 class="text-lg font-semibold mb-2">Lançamentos do período</h2>
+<ul class="space-y-2">
+  {% for l in lancamentos %}
+  <li class="bg-slate-900 border border-slate-800 rounded-md px-4 py-3 flex items-center justify-between">
+    <div>
+      <span class="font-medium">{{ l.categoria.nome }}</span>
+      <span class="text-slate-400"> · {{ l.conta.nome }}</span>
+      {% if l.descricao %}<span class="text-slate-500 text-sm"> — {{ l.descricao }}</span>{% endif %}
+    </div>
+    <div class="flex items-center gap-4">
+      <span class="text-slate-400 text-sm">{{ l.data.strftime("%d/%m/%Y") }}</span>
+      <span class="tabular-nums {{ 'text-rose-300' if l.tipo.value == 'despesa' else 'text-emerald-300' }}">
+        {{ "-" if l.tipo.value == "despesa" else "+" }}R$ {{ "%.2f"|format(l.valor) }}
+      </span>
+    </div>
+  </li>
+  {% else %}
+  <li class="text-slate-500 text-sm">Nenhum lançamento no período.</li>
+  {% endfor %}
+</ul>
+</div>
+
