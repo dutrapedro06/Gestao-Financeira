@@ -1,0 +1,33 @@
+<div id="pagina">
+<h1 class="text-2xl font-semibold mb-1">Projeção de saldo</h1>
+<p class="text-slate-400 text-sm mb-6">
+  Combina o que já aconteceu (últimos 30 dias) com o que as recorrências ativas garantem que vai acontecer.
+</p>
+
+<form hx-get="/projecao" hx-target="#pagina" hx-swap="outerHTML" class="flex items-end gap-3 mb-6">
+  <div>
+    <label class="text-xs text-slate-400 block mb-1">Projetar até</label>
+    <input type="date" name="ate" value="{{ ate }}"
+           class="rounded-md bg-slate-800 border border-slate-700 px-3 py-2">
+  </div>
+  <button class="rounded-md bg-emerald-600 hover:bg-emerald-500 px-4 py-2 font-medium">Projetar</button>
+</form>
+
+<div class="grid grid-cols-2 gap-3 mb-6">
+  <div class="bg-slate-900 border border-slate-800 rounded-md p-4">
+    <div class="text-slate-400 text-xs">Saldo atual</div>
+    <div class="text-lg font-semibold">R$ {{ "%.2f"|format(saldo_atual) }}</div>
+  </div>
+  <div class="bg-slate-900 border border-slate-800 rounded-md p-4">
+    <div class="text-slate-400 text-xs">Saldo projetado em {{ data_projecao.strftime("%d/%m/%Y") }}</div>
+    <div class="text-lg font-semibold {{ 'text-emerald-300' if saldo_projetado >= saldo_atual else 'text-rose-300' }}">
+      R$ {{ "%.2f"|format(saldo_projetado) }}
+    </div>
+  </div>
+</div>
+
+<div class="bg-slate-900 border border-slate-800 rounded-md p-4">
+  {{ grafico | safe }}
+</div>
+</div>
+

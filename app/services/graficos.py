@@ -32,3 +32,19 @@ def grafico_evolucao_saldo(df: pd.DataFrame) -> str:
     figura.update_layout(**_LAYOUT_PADRAO, yaxis_title="R$")
     return figura.to_html(include_plotlyjs=False, full_html=False)
 
+
+def grafico_projecao(df_historico: pd.DataFrame, df_projecao: pd.DataFrame) -> str:
+    figura = go.Figure()
+    if not df_historico.empty:
+        figura.add_trace(go.Scatter(
+            x=df_historico["data"], y=df_historico["saldo"], mode="lines",
+            name="Histórico", line=dict(color="#34d399", width=2),
+        ))
+    if not df_projecao.empty:
+        figura.add_trace(go.Scatter(
+            x=df_projecao["data"], y=df_projecao["saldo"], mode="lines",
+            name="Projeção", line=dict(color="#facc15", width=2, dash="dash"),
+        ))
+    figura.update_layout(**_LAYOUT_PADRAO, yaxis_title="R$", showlegend=True)
+    return figura.to_html(include_plotlyjs=False, full_html=False)
+
