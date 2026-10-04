@@ -70,3 +70,33 @@ def test_lancamento_sem_conta_cadastrada_mostra_aviso(cliente_logado):
     resposta = cliente_logado.get("/lancamentos")
     assert "Cadastre pelo menos uma" in resposta.text
 
+
+def test_editar_lancamento_via_http(cliente_logado):
+    cliente_logado.post("/contas", data={"nome": "Vale"})
+    cliente_logado.post("/categorias", data={"nome": "Mercado", "tipo": "despesa"})
+    cliente_logado.post("/lancamentos", data={
+        "tipo": "despesa", "conta_id": 1, "categoria_id": 1,
+        "valor": "50.00", "data": "2026-09-28",
+    })
+
+    resposta_edicao = cliente_logado.get("/lancamentos/1/editar")
+    assert "Salvar" in resposta_edicao.text
+
+    resposta = cliente_logado.put("/lancamentos/1", data={
+        "tipo": "despesa", "conta_id": 1, "categoria_id": 1,
+        "valor": "99.90", "data": "2026-09-28", "descricao": "Valor corrigido",
+    })
+    assert "-R$ 99.90" in resposta.text
+    assert "Valor corrigido" in resposta.text
+
+
+def test_excluir_lancamento_via_http(cliente_logado):
+    cliente_logado.post("/contas", data={"nome": "Vale"})
+    cliente_logado.post("/categorias", data={"nome": "Mercado", "tipo": "despesa"})
+    cliente_logado.post("/lancamentos", data={
+        "tipo": "despesa", "conta_id": 1, "categoria_id": 1, "valor": "50", "data": "2026-09-28",
+    })
+
+    resposta = cliente_logado.delete("/lancamentos/1")
+    assert "Nenhum lançamento ainda." in resposta.text
+

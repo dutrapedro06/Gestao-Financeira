@@ -86,3 +86,35 @@ def test_pausar_recorrencia_impede_novos_lancamentos(cliente_logado):
     lancamentos = cliente_logado.get("/lancamentos")
     assert "Nenhum lançamento ainda." in lancamentos.text
 
+
+def test_editar_recorrencia_via_http(cliente_logado):
+    cliente_logado.post("/contas", data={"nome": "Conta Corrente"})
+    cliente_logado.post("/categorias", data={"nome": "Aluguel", "tipo": "despesa"})
+    cliente_logado.post("/recorrencias", data={
+        "tipo": "despesa", "conta_id": 1, "categoria_id": 1,
+        "valor": "1200", "frequencia": "mensal", "dia_referencia": "5",
+        "data_inicio": "2026-01-05",
+    })
+
+    resposta_edicao = cliente_logado.get("/recorrencias/1/editar")
+    assert "Salvar" in resposta_edicao.text
+
+    resposta = cliente_logado.put("/recorrencias/1", data={
+        "tipo": "despesa", "conta_id": 1, "categoria_id": 1,
+        "valor": "1350", "frequencia": "mensal", "dia_referencia": "10",
+        "data_inicio": "2026-01-05",
+    })
+    assert "R$ 1350.00" in resposta.text
+
+
+def test_excluir_recorrencia_via_http(cliente_logado):
+    cliente_logado.post("/contas", data={"nome": "Conta Corrente"})
+    cliente_logado.post("/categorias", data={"nome": "Aluguel", "tipo": "despesa"})
+    cliente_logado.post("/recorrencias", data={
+        "tipo": "despesa", "conta_id": 1, "categoria_id": 1,
+        "valor": "1200", "frequencia": "mensal", "dia_referencia": "5",
+        "data_inicio": "2026-01-05",
+    })
+    resposta = cliente_logado.delete("/recorrencias/1")
+    assert "Nenhuma recorrência cadastrada ainda." in resposta.text
+

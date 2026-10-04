@@ -93,3 +93,42 @@ def test_rotas_exigem_login():
     resposta = cliente.get("/contas", follow_redirects=False)
     assert resposta.status_code == 401
 
+
+def test_excluir_conta_via_http(cliente_logado):
+    cliente_logado.post("/contas", data={"nome": "Conta Corrente"})
+    resposta = cliente_logado.delete("/contas/1")
+    assert "Nenhuma conta cadastrada ainda." in resposta.text
+
+
+def test_editar_categoria_via_http(cliente_logado):
+    cliente_logado.post("/categorias", data={"nome": "Mercado", "tipo": "despesa"})
+    resposta_edicao = cliente_logado.get("/categorias/1/editar")
+    assert "Salvar" in resposta_edicao.text
+
+    resposta = cliente_logado.put("/categorias/1", data={"nome": "Supermercado", "tipo": "despesa"})
+    assert ">Supermercado<" in resposta.text
+
+
+def test_excluir_categoria_via_http(cliente_logado):
+    cliente_logado.post("/categorias", data={"nome": "Mercado", "tipo": "despesa"})
+    resposta = cliente_logado.delete("/categorias/1")
+    assert "Nenhuma categoria cadastrada ainda." in resposta.text
+
+
+def test_logout_limpa_sessao(cliente_logado):
+    cliente_logado.post("/logout")
+    resposta = cliente_logado.get("/contas", follow_redirects=False)
+    assert resposta.status_code == 401
+
+
+def test_acessar_login_ja_autenticado_redireciona(cliente_logado):
+    resposta = cliente_logado.get("/login", follow_redirects=False)
+    assert resposta.status_code == 302
+    assert resposta.headers["location"] == "/"
+
+
+def test_raiz_redireciona_para_lancamentos_quando_logado(cliente_logado):
+    resposta = cliente_logado.get("/", follow_redirects=False)
+    assert resposta.status_code == 307
+    assert resposta.headers["location"] == "/lancamentos"
+

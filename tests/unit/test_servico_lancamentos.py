@@ -121,3 +121,38 @@ def test_saldo_reflete_lancamento_na_conta_certa(db, usuario, cenario):
     assert saldo_service.saldo_conta(db, cenario["conta_vale"].id) == -50
     assert saldo_service.saldo_conta(db, cenario["conta_salario"].id) == 0
 
+
+def test_atualizar_lancamento(db, usuario, cenario):
+    lancamento = servico_lancamentos.criar(
+        db, usuario.id,
+        tipo="despesa", conta_id=cenario["conta_vale"].id, categoria_id=cenario["categoria_mercado"].id,
+        valor="50", data=date.today().isoformat(),
+    )
+    atualizado = servico_lancamentos.atualizar(
+        db, usuario.id, lancamento.id,
+        tipo="despesa", conta_id=cenario["conta_salario"].id, categoria_id=cenario["categoria_mercado"].id,
+        valor="75", data=date.today().isoformat(), descricao="Ajustado",
+    )
+    assert atualizado.conta_id == cenario["conta_salario"].id
+    assert atualizado.valor == 75
+    assert atualizado.descricao == "Ajustado"
+
+
+def test_atualizar_lancamento_inexistente_lanca_nao_encontrado(db, usuario, cenario):
+    with pytest.raises(NaoEncontrado):
+        servico_lancamentos.atualizar(
+            db, usuario.id, 999,
+            tipo="despesa", conta_id=cenario["conta_vale"].id, categoria_id=cenario["categoria_mercado"].id,
+            valor="50", data=date.today().isoformat(),
+        )
+
+
+def test_excluir_lancamento_remove_de_verdade(db, usuario, cenario):
+    lancamento = servico_lancamentos.criar(
+        db, usuario.id,
+        tipo="despesa", conta_id=cenario["conta_vale"].id, categoria_id=cenario["categoria_mercado"].id,
+        valor="50", data=date.today().isoformat(),
+    )
+    servico_lancamentos.excluir(db, usuario.id, lancamento.id)
+    assert servico_lancamentos.listar(db, usuario.id) == []
+

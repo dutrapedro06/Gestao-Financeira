@@ -118,3 +118,32 @@ def test_excluir_regra_preserva_lancamentos_ja_gerados(db, usuario, cenario):
     assert len(lancamentos) == 2
     assert all(l.regra_recorrencia_id is None for l in lancamentos)
 
+
+def test_atualizar_regra(db, usuario, cenario):
+    regra = _criar_regra_aluguel(db, usuario.id, cenario)
+    atualizada = servico_recorrencias.atualizar(
+        db, usuario.id, regra.id,
+        tipo="despesa", conta_id=cenario["conta"].id, categoria_id=cenario["categoria"].id,
+        valor="1350", frequencia="mensal", dia_referencia="10",
+        data_inicio=date(2026, 1, 10).isoformat(),
+    )
+    assert atualizada.valor == 1350
+    assert atualizada.dia_referencia == 10
+
+
+def test_atualizar_regra_inexistente_lanca_nao_encontrado(db, usuario, cenario):
+    from app.services.erros import NaoEncontrado
+    with pytest.raises(NaoEncontrado):
+        servico_recorrencias.atualizar(
+            db, usuario.id, 999,
+            tipo="despesa", conta_id=cenario["conta"].id, categoria_id=cenario["categoria"].id,
+            valor="1200", frequencia="mensal", dia_referencia="5",
+            data_inicio=date(2026, 1, 5).isoformat(),
+        )
+
+
+def test_alternar_regra_inexistente_lanca_nao_encontrado(db, usuario):
+    from app.services.erros import NaoEncontrado
+    with pytest.raises(NaoEncontrado):
+        servico_recorrencias.alternar_ativa(db, usuario.id, 999)
+

@@ -112,3 +112,37 @@ def test_transferencia_nao_conta_como_despesa_por_categoria(db, usuario, contas)
     )
     assert total_despesas_por_categoria == 0
 
+
+def test_atualizar_transferencia(db, usuario, contas):
+    t = servico_transferencias.criar(
+        db, usuario.id,
+        conta_origem_id=contas["salario"].id, conta_destino_id=contas["investimento"].id,
+        valor="300", data=date.today().isoformat(),
+    )
+    atualizada = servico_transferencias.atualizar(
+        db, usuario.id, t.id,
+        conta_origem_id=contas["investimento"].id, conta_destino_id=contas["salario"].id,
+        valor="150", data=date.today().isoformat(), descricao="Estorno parcial",
+    )
+    assert atualizada.conta_origem_id == contas["investimento"].id
+    assert atualizada.valor == 150
+
+
+def test_atualizar_transferencia_inexistente_lanca_nao_encontrado(db, usuario, contas):
+    with pytest.raises(NaoEncontrado):
+        servico_transferencias.atualizar(
+            db, usuario.id, 999,
+            conta_origem_id=contas["salario"].id, conta_destino_id=contas["investimento"].id,
+            valor="100", data=date.today().isoformat(),
+        )
+
+
+def test_excluir_transferencia_remove_de_verdade(db, usuario, contas):
+    t = servico_transferencias.criar(
+        db, usuario.id,
+        conta_origem_id=contas["salario"].id, conta_destino_id=contas["investimento"].id,
+        valor="300", data=date.today().isoformat(),
+    )
+    servico_transferencias.excluir(db, usuario.id, t.id)
+    assert servico_transferencias.listar(db, usuario.id) == []
+

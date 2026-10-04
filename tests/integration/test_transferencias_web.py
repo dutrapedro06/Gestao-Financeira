@@ -79,3 +79,31 @@ def test_nao_permite_transferir_para_a_mesma_conta(cliente_logado):
     })
     assert "não podem ser a mesma" in resposta.text
 
+
+def test_editar_transferencia_via_http(cliente_logado):
+    cliente_logado.post("/contas", data={"nome": "Salário"})
+    cliente_logado.post("/contas", data={"nome": "Investimento"})
+    cliente_logado.post("/transferencias", data={
+        "conta_origem_id": 1, "conta_destino_id": 2, "valor": "300", "data": "2026-09-28",
+    })
+
+    resposta_edicao = cliente_logado.get("/transferencias/1/editar")
+    assert "Salvar" in resposta_edicao.text
+
+    resposta = cliente_logado.put("/transferencias/1", data={
+        "conta_origem_id": 1, "conta_destino_id": 2, "valor": "500", "data": "2026-09-28",
+        "descricao": "Aporte maior",
+    })
+    assert "R$ 500.00" in resposta.text
+    assert "Aporte maior" in resposta.text
+
+
+def test_excluir_transferencia_via_http(cliente_logado):
+    cliente_logado.post("/contas", data={"nome": "Salário"})
+    cliente_logado.post("/contas", data={"nome": "Investimento"})
+    cliente_logado.post("/transferencias", data={
+        "conta_origem_id": 1, "conta_destino_id": 2, "valor": "300", "data": "2026-09-28",
+    })
+    resposta = cliente_logado.delete("/transferencias/1")
+    assert "Nenhuma transferência ainda." in resposta.text
+
