@@ -14,8 +14,10 @@ from app.database import get_db
 from app.web import auth as auth_web
 from app.web import categorias as categorias_web
 from app.web import contas as contas_web
+from app.web import dashboard as dashboard_web
 from app.web import fontes_renda as fontes_renda_web
 from app.web import lancamentos as lancamentos_web
+from app.web import projecao as projecao_web
 from app.web import recorrencias as recorrencias_web
 from app.web import transferencias as transferencias_web
 from app.web.deps import usuario_atual_opcional
@@ -32,11 +34,13 @@ app.add_middleware(SessionMiddleware, secret_key=settings.secret_key)
 
 app.include_router(auth_web.router)
 app.include_router(contas_web.router)
+app.include_router(dashboard_web.router)
 app.include_router(categorias_web.router)
 app.include_router(fontes_renda_web.router)
 app.include_router(lancamentos_web.router)
 app.include_router(transferencias_web.router)
 app.include_router(recorrencias_web.router)
+app.include_router(projecao_web.router)
 
 
 @app.get("/")
